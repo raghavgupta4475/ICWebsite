@@ -41,16 +41,29 @@ import CustomInput from "components/CustomInput/CustomInput.jsx";
 import loginPageStyle from "assets/jss/material-kit-react/views/loginPage.jsx";
 
 import image from "assets/img/bg7.jpg";
+import {Link} from 'react-router-dom';
+import firebase from 'firebase';
+import auth from '../../firebase';
+import messaging from '../../firebase';
+
 
 class LoginPage extends React.Component {
   constructor(props) {
     super(props);
     // we use this to make the card to appear after the page has been rendered
     this.state = {
-      cardAnimaton: "cardHidden"
-    };
-  }
-  componentDidMount() {
+      cardAnimaton: "cardHidden",
+      authenticated:false,
+      path:"",
+      email:"",
+      password:""
+    };}
+    
+
+  componentDidMount=()=> {
+    // console.log("mount:"+this.state.mount)
+    // this.setState({mount:1})
+    // console.log(document.getElementById("pass").value);
     // we add a hidden class to the card and after 700 ms we delete it and the transition appears
     setTimeout(
       function() {
@@ -58,8 +71,45 @@ class LoginPage extends React.Component {
       }.bind(this),
       700
     );
+    firebase.messaging().requestPermission()
+    .then(async function() {
+     const token = await firebase.messaging().getToken();
+    })
+    .catch(function(err) {
+      console.log("Unable to get permission to notify.", err);
+    });
   }
+    componentDidUpdate=()=>{
+      console.log("update")
+      let passwords=document.getElementById("pass").value;
+      let emails=document.getElementById("email").value;
+        firebase.auth().signInWithEmailAndPassword(emails,passwords).then(()=>{
+          this.setState({
+              path:"/optionspage"
+          })
+        })
+        .catch((e)=>{console.log("error in auth:"+e)})
+      }
+  // getstartedHandler=()=>{
+  //   console.log(this.state.email)
+  //   console.log(this.state.password)
+  //   console.log(this.state.path)
+  //   firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password).
+  //   then(()=>{
+  //     this.setState({
+  //       path:"/optionspage"
+  //     })
+  //   })
+  //   .catch((error)=> {
+  //     this.setState({
+  //       path:""
+  //     })
+  //   });
+  //   console.log(this.state.path)
+    
+  // }
   render() {
+    // console.log("1")
     const { classes, ...rest } = this.props;
     return (
       <div>
@@ -135,6 +185,7 @@ class LoginPage extends React.Component {
                       <CustomInput
                         labelText="Email..."
                         id="email"
+                        changed={this.changedHandler}
                         formControlProps={{
                           fullWidth: true
                         }}
@@ -142,14 +193,18 @@ class LoginPage extends React.Component {
                           type: "email",
                           endAdornment: (
                             <InputAdornment position="end">
-                              <Email className={classes.inputIconsColor} />
+                              <Email 
+                              className={classes.inputIconsColor}
+                              changed={this.onChangeHandler} />
                             </InputAdornment>
                           )
                         }}
                       />
+        
                       <CustomInput
                         labelText="Password"
                         id="pass"
+                        changed={this.onChangeHandler}
                         formControlProps={{
                           fullWidth: true
                         }}
@@ -167,8 +222,11 @@ class LoginPage extends React.Component {
                       />
                     </CardBody>
                     <CardFooter className={classes.cardFooter}>
-                      <Button simple color="primary" size="lg">
+                      <Button simple color="primary" size="lg"  >
+                        <Link to ={this.state.path}>
                         Get started
+                        </Link>
+                        
                       </Button>
                     </CardFooter>
                   </form>

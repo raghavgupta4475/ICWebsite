@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import React, { useEffect } from "react";
 // nodejs library to set properties for components
 import PropTypes from "prop-types";
 // nodejs library that concatenates classes
@@ -29,6 +29,9 @@ import Input from "@material-ui/core/Input";
 import customInputStyle from "assets/jss/material-kit-react/components/customInputStyle.jsx";
 
 function CustomInput({ ...props }) {
+  // useEffect(()=>{
+  //    console.log("haha")
+  // })
   const {
     classes,
     formControlProps,
@@ -80,6 +83,7 @@ function CustomInput({ ...props }) {
         </InputLabel>
       ) : null}
       <Input
+      onChange={props.changed}
         classes={{
           input: inputClasses,
           root: marginTop,
